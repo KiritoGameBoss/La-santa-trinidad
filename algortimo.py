@@ -1,28 +1,33 @@
 """
 Campus sin barreras - grafo con coordenadas reales (Hackathon LYOSS USM 2026)
-
+ 
 Perfiles de usuario:
-  - "caminante":           puede usar tramos AZULES y ROJOS
-  - "movilidad_reducida":  puede usar solo tramos AZULES
-
+  - "caminante":           puede usar tramos AZULES, ROJOS y MORADOS
+  - "movilidad_reducida":  puede usar tramos AZULES y MORADOS
+ 
+Tramo MORADO: sirve a ambos perfiles, pero para movilidad reducida requiere
+APOYO EXTRA, así que la ruta muestra una advertencia.
+ 
 Equivalencia de edificios (antes por color):
   Negro = T | Amarillo = Casino | Verde = B | Naranja = C | Café = P | Celeste = M
-
+ 
 Uso:  python grafo_folium.py        (genera mi_mapa.html con una ruta de ejemplo)
 """
 import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import dijkstra
-
+ 
 VELOCIDAD_M_S = 1.2   # SUPUESTO: ~72 m por minuto (declararlo en la documentación)
-
+ 
 # Qué tramos puede usar cada perfil
 PERFILES = {
-    "caminante": {"azul", "rojo"},
-    "movilidad_reducida": {"azul"},
+    "caminante": {"azul", "rojo", "morado"},
+    "movilidad_reducida": {"azul", "morado"},
 }
-
-
+ 
+COLORES = {"azul": "#1d6fe8", "rojo": "#d62828", "morado": "#8e44ad"}
+ 
+ 
 def haversine_metros(lat1, lon1, lat2, lon2):
     """Distancia real aproximada en metros entre dos coordenadas (lat, lon)."""
     r = 6371000.0
@@ -34,8 +39,8 @@ def haversine_metros(lat1, lon1, lat2, lon2):
         + np.cos(phi1) * np.cos(phi2) * np.sin(dlambda / 2.0) ** 2
     )
     return float(2.0 * r * np.arctan2(np.sqrt(a), np.sqrt(1.0 - a)))
-
-
+ 
+ 
 # ==========================================
 # 1. NODOS (IDs únicos del 0 al 22)
 # ==========================================
@@ -66,20 +71,21 @@ nodos = [
     {"id": 21, "nombre": "Intersección 21",              "tipo": "interseccion", "edificio": None,     "coord": (-33.0358, -71.5959)},
     {"id": 22, "nombre": "Intersección 22",              "tipo": "interseccion", "edificio": None,     "coord": (-33.0355, -71.5939)},
 ]
-
+ 
 # Para cambiar una coordenada por ID: nodos_por_id[1]["coord"] = (-33.03455, -71.59785)
 nodos_por_id = {n["id"]: n for n in nodos}
-
-
+ 
+ 
 # ==========================================
 # 2. ARISTAS (tramos azules y rojos)
 # ==========================================
-# "azul": lo pueden usar caminantes y movilidad reducida
-# "rojo": lo pueden usar solo caminantes
-# Si un mismo tramo sirve a ambos, basta con ponerlo en azul.
+# "azul":   lo pueden usar caminantes y movilidad reducida
+# "rojo":   lo pueden usar solo caminantes
+# "morado": lo pueden usar ambos, pero movilidad reducida necesita apoyo extra
+# Si un mismo tramo sirve a ambos sin ayuda, basta con ponerlo en azul.
 aristas = [
     # Rama oeste hacia zona Casino y central
-    (0, 1, "azul"), (0, 1, "rojo"),
+    (0, 1, "morado"),   # solo era rojo: con apoyo extra pueden pasar quienes tienen movilidad reducida
     (1, 2, "azul"),
     (1, 3, "rojo"),
     (3, 4, "rojo"),
@@ -89,14 +95,14 @@ aristas = [
     (21, 5, "azul"),
     (20, 7, "azul"),
     (21, 2, "rojo"),
-
+ 
     # Edificio B
     (5, 6, "azul"),
     (6, 7, "rojo"),
     (6, 9, "rojo"),
     (8, 9, "rojo"),
     (8, 11, "azul"),
-
+ 
     # Rama sur hacia edificios C y P
     (20, 10, "azul"),
     (10, 13, "azul"),
@@ -107,22 +113,23 @@ aristas = [
     (19, 12, "rojo"),
     (18, 12, "rojo"),
     (13, 14, "azul"),
-
+ 
     # Rama este hacia edificio M (Valdés)
     (9, 15, "azul"),
-    (11, 22, "azul"),
-    (16, 22, "azul"),
+    (11, 22, "rojo"),
+    (16, 22, "rojo"),
     (12, 15, "rojo"),
     (12, 22, "rojo"),
     (15, 16, "azul"),
     (16, 17, "azul"),
 ]
-
-
+ 
+ 
 # ==========================================
 # 3. GRAFO (scipy csgraph)
 # ==========================================
-def construir_grafo(nodos_dict, aristas_lista, perfil="movilidad_reducida", factor_rojo=1.0):
+def construir_grafo(nodos_dict, aristas_lista, perfil="movilidad_reducida",
+                    factor_rojo=1.0, factor_morado=1.0):
     """Matriz de pesos en metros. Un tramo repetido (azul y rojo) cuenta UNA vez."""
     permitidos = PERFILES[perfil]
     n = len(nodos_dict)
@@ -136,29 +143,41 @@ def construir_grafo(nodos_dict, aristas_lista, perfil="movilidad_reducida", fact
         d = haversine_metros(lat1, lon1, lat2, lon2)
         if canal == "rojo":
             d *= factor_rojo
+        elif canal == "morado":
+            d *= factor_morado   # >1 para preferir rutas sin apoyo extra cuando hay alternativa
         clave = (min(u, v), max(u, v))
         pesos[clave] = min(pesos.get(clave, float("inf")), d)   # evita sumar duplicados
-
+ 
     rows, cols, weights = [], [], []
     for (u, v), w in pesos.items():
         rows += [u, v]
         cols += [v, u]
         weights += [w, w]
     return csr_matrix((weights, (rows, cols)), shape=(n, n))
-
-
+ 
+ 
 def reconstruir_camino(pred, inicio, fin):
     camino = []
     actual = fin
     while actual != -9999 and actual != inicio:
-        camino.append(actual)
+        camino.append(int(actual))
         actual = pred[actual]
     if actual == inicio:
-        camino.append(inicio)
+        camino.append(int(inicio))
         return camino[::-1]
     return []
-
-
+ 
+ 
+def requiere_apoyo(u, v, perfil):
+    """True si el tramo u-v solo puede recorrerse como MORADO para ese perfil
+    y el perfil es de movilidad reducida (los caminantes no necesitan apoyo)."""
+    if perfil != "movilidad_reducida":
+        return False
+    canales = {c.strip().lower() for a, b, c in aristas
+               if {a, b} == {u, v} and c.strip().lower() in PERFILES[perfil]}
+    return canales == {"morado"}
+ 
+ 
 def ruta_entre_nodos(origen, destino, perfil="movilidad_reducida"):
     """Devuelve (lista de IDs, metros) o None si no hay ruta para ese perfil."""
     grafo = construir_grafo(nodos_por_id, aristas, perfil=perfil)
@@ -167,20 +186,20 @@ def ruta_entre_nodos(origen, destino, perfil="movilidad_reducida"):
     if not camino:
         return None
     return camino, float(dist[destino])
-
-
+ 
+ 
 # ==========================================
 # 4. RUTA ENTRE EDIFICIOS (lo que elige el usuario en los menús)
 # ==========================================
 def edificios():
     """Lista de edificios disponibles para los menús desplegables."""
     return sorted({n["edificio"] for n in nodos if n["tipo"] == "entrada"})
-
-
+ 
+ 
 def entradas_de(edificio):
     return [n["id"] for n in nodos if n["tipo"] == "entrada" and n["edificio"] == edificio]
-
-
+ 
+ 
 def ruta_entre_edificios(origen_ed, destino_ed, perfil="movilidad_reducida"):
     """Mejor ruta entre cualquier entrada del origen y cualquiera del destino."""
     if origen_ed == destino_ed:
@@ -190,11 +209,14 @@ def ruta_entre_edificios(origen_ed, destino_ed, perfil="movilidad_reducida"):
         for d in entradas_de(destino_ed):
             r = ruta_entre_nodos(o, d, perfil)
             if r and (mejor is None or r[1] < mejor["metros"]):
+                tramos = [(r[0][i], r[0][i + 1]) for i in range(len(r[0]) - 1)]
+                apoyo = [t for t in tramos if requiere_apoyo(*t, perfil)]
                 mejor = {"nodos": r[0], "metros": r[1], "perfil": perfil,
-                         "origen": origen_ed, "destino": destino_ed}
+                         "origen": origen_ed, "destino": destino_ed,
+                         "tramos_con_apoyo": apoyo}
     return mejor
-
-
+ 
+ 
 def describir_ruta(ruta):
     """Texto paso a paso a partir de los nodos recorridos."""
     ids = ruta["nodos"]
@@ -207,11 +229,15 @@ def describir_ruta(ruta):
     for i in range(len(ids) - 1):
         a, b = nodos_por_id[ids[i]], nodos_por_id[ids[i + 1]]
         m = haversine_metros(*a["coord"], *b["coord"])
-        lineas.append(f"{i + 1}. {a['nombre']} → {b['nombre']} ({round(m)} m)")
+        nota = "  [REQUIERE APOYO EXTRA]" if (ids[i], ids[i + 1]) in ruta["tramos_con_apoyo"] else ""
+        lineas.append(f"{i + 1}. {a['nombre']} → {b['nombre']} ({round(m)} m){nota}")
     lineas.append(f"Llegas por: {nodos_por_id[ids[-1]]['nombre']}")
+    if ruta["tramos_con_apoyo"]:
+        lineas.append("ATENCIÓN: esta ruta incluye tramos que requieren apoyo extra "
+                      "(ayuda de otra persona) para personas con movilidad reducida.")
     return lineas
-
-
+ 
+ 
 def diagnostico():
     """Pares de edificios SIN ruta para cada perfil (sirve para detectar tramos que faltan)."""
     resultado = {}
@@ -221,14 +247,14 @@ def diagnostico():
             if a < b and not ruta_entre_edificios(a, b, perfil)
         ]
     return resultado
-
-
+ 
+ 
 # ==========================================
 # 5. MAPA EN FOLIUM
 # ==========================================
 def crear_mapa(ruta=None, archivo="mi_mapa.html"):
     import folium   # se importa aquí para poder probar el grafo sin folium
-
+ 
     mapa = folium.Map(
         location=[-33.03486, -71.5952],
         zoom_start=17,
@@ -248,21 +274,21 @@ def crear_mapa(ruta=None, archivo="mi_mapa.html"):
         min_lon=-71.602,
         max_lon=-71.588,
     )
-
+ 
     # Muestra [lat, lon] al hacer clic (sirve para afinar coordenadas)
     folium.LatLngPopup().add_to(mapa)
-
+ 
     # Todos los tramos
     for u, v, canal in aristas:
         canal = canal.strip().lower()
         folium.PolyLine(
             locations=[nodos_por_id[u]["coord"], nodos_por_id[v]["coord"]],
-            color="#1d6fe8" if canal == "azul" else "#d62828",
+            color=COLORES.get(canal, "#888888"),
             weight=3,
             opacity=0.75,
             tooltip=f"Tramo {canal.upper()}: ID {u} <-> ID {v}",
         ).add_to(mapa)
-
+ 
     # Ruta calculada (la que sigue el usuario)
     if ruta:
         folium.PolyLine(
@@ -272,7 +298,7 @@ def crear_mapa(ruta=None, archivo="mi_mapa.html"):
             opacity=0.95,
             tooltip=f"Ruta {ruta['origen']} → {ruta['destino']}: {round(ruta['metros'])} m",
         ).add_to(mapa)
-
+ 
     # Nodos
     for n in nodos:
         lat, lon = n["coord"]
@@ -290,8 +316,9 @@ def crear_mapa(ruta=None, archivo="mi_mapa.html"):
                 location=n["coord"], radius=5, color="#333333",
                 fill=True, fill_opacity=0.9, tooltip=etiqueta, popup=etiqueta,
             ).add_to(mapa)
-
+ 
     mapa.save(archivo)
     return archivo
-
+ 
+ 
 
