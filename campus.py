@@ -44,9 +44,7 @@ def haversine_metros(lat1, lon1, lat2, lon2):
     return float(2.0 * r * np.arctan2(np.sqrt(a), np.sqrt(1.0 - a)))
  
  
-# ==========================================
-# 1. NODOS (IDs del 0 al 22; el 15 se eliminó y su número no se reutiliza)
-# ==========================================
+
 nodos = [
     {"id": 0,  "nombre": "Acceso Edificio T",            "tipo": "entrada",      "edificio": "T",      "coord": (-33.035189, -71.597636)},
     {"id": 1,  "nombre": "Quiebre Oeste Azul/Rojo",      "tipo": "interseccion", "edificio": None,     "coord": (-33.035496, -71.597156)},
@@ -54,7 +52,6 @@ nodos = [
     {"id": 3,  "nombre": "Quiebre Norte Rojo",           "tipo": "interseccion", "edificio": None,     "coord": (-33.034875, -71.596187)},
     {"id": 4,  "nombre": "Entrada Casino",               "tipo": "entrada",      "edificio": "Casino", "coord": (-33.035286, -71.595930)},
     {"id": 5,  "nombre": "Convergencia Central-Oeste",   "tipo": "interseccion", "edificio": None,     "coord": (-33.035510, -71.595729)},
-    # REVISAR: este nodo tenía un comentario "#no" y coordenadas aproximadas
     {"id": 6,  "nombre": "Entrada B (centro-norte)",     "tipo": "entrada",      "edificio": "B",      "coord": (-33.0355, -71.5954)},
     {"id": 7,  "nombre": "Entrada B (centro-sur)",       "tipo": "entrada",      "edificio": "B",      "coord": (-33.0359, -71.5952)},
     {"id": 8,  "nombre": "Entrada B (centro-este)",      "tipo": "entrada",      "edificio": "B",      "coord": (-33.0357, -71.5947)},
@@ -78,15 +75,14 @@ nodos_por_id = {n["id"]: n for n in nodos}
  
  
 # ==========================================
-# 2. ARISTAS (tramos azules y rojos)
+#  ARISTAS 
 # ==========================================
 # "azul":   lo pueden usar caminantes y movilidad reducida
 # "rojo":   lo pueden usar solo caminantes
 # "morado": lo pueden usar ambos, pero movilidad reducida necesita apoyo extra
-# Si un mismo tramo sirve a ambos sin ayuda, basta con ponerlo en azul.
 aristas = [
     # Rama oeste hacia zona Casino y central
-    (0, 1, "morado"),   # solo era rojo: con apoyo extra pueden pasar quienes tienen movilidad reducida
+    (0, 1, "morado"),   
     (1, 2, "azul"),
     (1, 3, "rojo"),
     (3, 4, "rojo"),
@@ -116,17 +112,17 @@ aristas = [
     (13, 14, "azul"),
  
     # Rama este hacia edificio M (Valdés)
-    (9, 16, "azul"),     # antes pasaba por el nodo 15 (eliminado)
+    (9, 16, "azul"),     
     (11, 22, "azul"),
     (16, 22, "azul"),
-    (12, 16, "rojo"),    # antes pasaba por el nodo 15 (eliminado)
+    (12, 16, "rojo"),  
     (12, 22, "rojo"),
     (16, 17, "azul"),
 ]
  
  
 # ==========================================
-# 3. GRAFO (scipy csgraph)
+#  GRAFO 
 # ==========================================
 def construir_grafo(nodos_dict, aristas_lista, perfil="movilidad_reducida",
                     factor_rojo=1.0, factor_morado=1.0):
@@ -189,7 +185,7 @@ def ruta_entre_nodos(origen, destino, perfil="movilidad_reducida"):
  
  
 # ==========================================
-# 4. RUTA ENTRE EDIFICIOS (lo que elige el usuario en los menús)
+#  RUTA ENTRE EDIFICIOS
 # ==========================================
 def edificios():
     """Lista de edificios disponibles para los menús desplegables."""
@@ -250,7 +246,7 @@ def diagnostico():
  
  
 # ==========================================
-# 5. MAPA EN FOLIUM
+#  MAPA EN FOLIUM
 # ==========================================
 def crear_mapa(ruta=None, archivo="mi_mapa.html"):
     import folium   # se importa aquí para poder probar el grafo sin folium
@@ -285,7 +281,7 @@ def crear_mapa(ruta=None, archivo="mi_mapa.html"):
             ).add_to(mapa)
         nodos_visibles = [nodos_por_id[i] for i in ids]
     else:
-        # Sin ruta se muestra toda la red (útil para revisar el grafo)
+        # Sin ruta se muestra toda la red
         for u, v, canal in aristas:
             canal = canal.strip().lower()
             folium.PolyLine(
