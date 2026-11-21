@@ -1,3 +1,4 @@
+
 """
 Campus sin barreras - grafo con coordenadas reales (Hackathon LYOSS USM 2026)
  
@@ -11,7 +12,9 @@ APOYO EXTRA, así que la ruta muestra una advertencia.
 Equivalencia de edificios (antes por color):
   Negro = T | Amarillo = Casino | Verde = B | Naranja = C | Café = P | Celeste = M
  
-Uso:  python grafo_folium.py        (genera mi_mapa.html con una ruta de ejemplo)
+Uso:  r = ruta_entre_edificios("T", "P", "movilidad_reducida")
+      crear_mapa(r)        # genera mi_mapa.html solo con la ruta
+      crear_mapa()         # genera el mapa con toda la red
 """
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -42,7 +45,7 @@ def haversine_metros(lat1, lon1, lat2, lon2):
  
  
 # ==========================================
-# 1. NODOS (IDs únicos del 0 al 22)
+# 1. NODOS (IDs del 0 al 22; el 15 se eliminó y su número no se reutiliza)
 # ==========================================
 nodos = [
     {"id": 0,  "nombre": "Acceso Edificio T",            "tipo": "entrada",      "edificio": "T",      "coord": (-33.035189, -71.597636)},
@@ -61,8 +64,6 @@ nodos = [
     {"id": 12, "nombre": "Entrada C (este)",             "tipo": "entrada",      "edificio": "C",      "coord": (-33.0357, -71.5938)},
     {"id": 13, "nombre": "Entrada C (sur)",              "tipo": "entrada",      "edificio": "C",      "coord": (-33.0363, -71.5944)},
     {"id": 14, "nombre": "Entrada Edificio P",           "tipo": "entrada",      "edificio": "P",      "coord": (-33.0370, -71.5942)},
-    # REVISAR: los nodos 15 y 16 tienen las mismas coordenadas (distancia 0 m)
-    {"id": 15, "nombre": "Convergencia Este Azul/Rojo",  "tipo": "interseccion", "edificio": None,     "coord": (-33.0353, -71.5933)},
     {"id": 16, "nombre": "Quiebre Este Alto",            "tipo": "interseccion", "edificio": None,     "coord": (-33.0353, -71.5933)},
     {"id": 17, "nombre": "Entrada Edificio M (Valdés)",  "tipo": "entrada",      "edificio": "M",      "coord": (-33.0351, -71.5929)},
     {"id": 18, "nombre": "Intersección interior C (18)", "tipo": "interseccion", "edificio": "C",      "coord": (-33.0360, -71.5945)},
@@ -115,12 +116,11 @@ aristas = [
     (13, 14, "azul"),
  
     # Rama este hacia edificio M (Valdés)
-    (9, 15, "azul"),
+    (9, 16, "azul"),     # antes pasaba por el nodo 15 (eliminado)
     (11, 22, "rojo"),
     (16, 22, "rojo"),
-    (12, 15, "rojo"),
+    (12, 16, "rojo"),    # antes pasaba por el nodo 15 (eliminado)
     (12, 22, "rojo"),
-    (15, 16, "azul"),
     (16, 17, "azul"),
 ]
  
@@ -132,7 +132,7 @@ def construir_grafo(nodos_dict, aristas_lista, perfil="movilidad_reducida",
                     factor_rojo=1.0, factor_morado=1.0):
     """Matriz de pesos en metros. Un tramo repetido (azul y rojo) cuenta UNA vez."""
     permitidos = PERFILES[perfil]
-    n = len(nodos_dict)
+    n = max(nodos_dict) + 1   # los IDs se usan como índices de la matriz (el 15 queda vacío)
     pesos = {}
     for u, v, canal in aristas_lista:
         canal = canal.strip().lower()
@@ -278,29 +278,35 @@ def crear_mapa(ruta=None, archivo="mi_mapa.html"):
     # Muestra [lat, lon] al hacer clic (sirve para afinar coordenadas)
     folium.LatLngPopup().add_to(mapa)
  
-    # Todos los tramos
-    for u, v, canal in aristas:
-        canal = canal.strip().lower()
-        folium.PolyLine(
-            locations=[nodos_por_id[u]["coord"], nodos_por_id[v]["coord"]],
-            color=COLORES.get(canal, "#888888"),
-            weight=3,
-            opacity=0.75,
-            tooltip=f"Tramo {canal.upper()}: ID {u} <-> ID {v}",
-        ).add_to(mapa)
- 
-    # Ruta calculada (la que sigue el usuario)
     if ruta:
-        folium.PolyLine(
-            locations=[nodos_por_id[i]["coord"] for i in ruta["nodos"]],
-            color="#2ecc71",
-            weight=8,
-            opacity=0.95,
-            tooltip=f"Ruta {ruta['origen']} → {ruta['destino']}: {round(ruta['metros'])} m",
-        ).add_to(mapa)
+        # Con una ruta calculada solo se muestran la ruta y sus puntos
+        ids = ruta["nodos"]
+        for u, v in zip(ids[:-1], ids[1:]):
+            apoyo = (u, v) in ruta["tramos_con_apoyo"]
+            folium.PolyLine(
+                locations=[nodos_por_id[u]["coord"], nodos_por_id[v]["coord"]],
+                color=COLORES["morado"] if apoyo else "#2ecc71",
+                weight=8,
+                opacity=0.95,
+                tooltip=("Requiere apoyo extra" if apoyo else
+                         f"Ruta {ruta['origen']} → {ruta['destino']}: {round(ruta['metros'])} m"),
+            ).add_to(mapa)
+        nodos_visibles = [nodos_por_id[i] for i in ids]
+    else:
+        # Sin ruta se muestra toda la red (útil para revisar el grafo)
+        for u, v, canal in aristas:
+            canal = canal.strip().lower()
+            folium.PolyLine(
+                locations=[nodos_por_id[u]["coord"], nodos_por_id[v]["coord"]],
+                color=COLORES.get(canal, "#888888"),
+                weight=3,
+                opacity=0.75,
+                tooltip=f"Tramo {canal.upper()}: ID {u} <-> ID {v}",
+            ).add_to(mapa)
+        nodos_visibles = nodos
  
     # Nodos
-    for n in nodos:
+    for n in nodos_visibles:
         lat, lon = n["coord"]
         etiqueta = f"ID {n['id']} — {n['nombre']}"
         if n["tipo"] == "entrada":
@@ -320,5 +326,3 @@ def crear_mapa(ruta=None, archivo="mi_mapa.html"):
     mapa.save(archivo)
     return archivo
  
- 
-
