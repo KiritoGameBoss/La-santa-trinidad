@@ -25,19 +25,21 @@
 
             python -m venv .venv
             .venv\Scripts\Activate.ps1
-
+    pip install flask folium scipy numpy
     pip install -r requirements.txt
+    python app.py
+    Entrar al link https://127.0.0.1:5000
 
 
-## Instrucciones de ejecucion: 
+## Instrucciones de ejecucion:
     1.Elegir desde donde empezaras la ruta con los edificios seleccionados
     2.Elegir a donde quieres llegar con los edificios seleccionados 
-    3.Presionar el boton de "Generar mapa" 
+    3.Presionar el boton de "Generar mapa", se asume que la persona camina a 72[m] por minuto
 
 ## Tecnologias utilizadas:
     Mapa de la api de Openstreetmap.fr
     Se uso Python como lenguaje principal
-    la libreria utilizadas scipy, python-fasthtml , folium y numpy, flask
+    la libreria utilizadas scipy, folium, numpy, flask
 
 ## Herramientas de inteligencia artificicial:
     Se uso Claude, para corregir problemas errores que aparecian en nuestro mapa 

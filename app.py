@@ -1,12 +1,12 @@
 import os, tempfile, uuid
 from flask import Flask, jsonify, request, send_from_directory, Response
-import campus   # tu archivo campus.py
+import campus
 
 app = Flask(__name__, static_folder="static")
 
 
 def perfil_desde_request():
-    # el switch del index manda discapacitado=1
+    # activa/desactiva la movilidad reducida
     return "movilidad_reducida" if request.args.get("discapacitado") == "1" else "caminante"
 
 
@@ -17,7 +17,7 @@ def index():
 
 @app.route("/api/edificios")
 def api_edificios():
-    return jsonify(campus.edificios())          # ["B","C","Casino","M","P","T"]
+    return jsonify(campus.edificios())          
 
 
 @app.route("/api/ruta")
@@ -37,7 +37,6 @@ def api_ruta():
         "con_apoyo": len(ruta["tramos_con_apoyo"]) > 0,
         "pasos": campus.describir_ruta(ruta),
     })
-
 
 @app.route("/mapa")
 def mapa():
