@@ -8,10 +8,6 @@ mapa = folium.Map(
     tiles="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
     attr="© OpenStreetMap contributors, tiles by OSM France",
     zoom_control=False,       # quita los botones + y -
-    scrollWheelZoom=False,    # sin zoom con la rueda
-    doubleClickZoom=False,    # sin zoom con doble clic
-    touchZoom=False,          # sin zoom con pellizco (celular)
-    boxZoom=False,            # sin zoom con Shift + arrastrar
     keyboard=False,           # sin zoom ni movimiento con el teclado (flechas, + y -)
     max_bounds=True,
     min_lat=-33.040, max_lat=-33.030,
