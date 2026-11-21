@@ -43,7 +43,7 @@
                 <small id="textoModoRuta" class="d-block mt-1">Modo actual: Ruta estándar</small>
               </div>
 
-              <button type="submit" class="btn btn-primary w-100 mb-2">Generar Mapa</button>
+              <button type="submit" class="btn btn-primary w-100">Generar Mapa</button>
             </form>
 
             <div id="estadoRuta" class="alert alert-info mt-3 d-none py-2 small"></div>
@@ -103,10 +103,6 @@
         : "Modo actual: Ruta estándar";
     }
 
-    function mostrarEstado(html, tipo) {
-      estadoRuta.className = `alert alert-${tipo} mt-3 py-2 small`;
-      estadoRuta.innerHTML = html;
-    }
 
     async function generarMapaActual() {
       const origen = selectOrigen.value;
