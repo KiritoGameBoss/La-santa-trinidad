@@ -1,3 +1,2 @@
 # La-santa-trinidad
-hackaton de noobs 1
-# oaoaoao 
+hackaton de noobs 2
