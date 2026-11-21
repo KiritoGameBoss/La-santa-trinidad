@@ -1,0 +1,54 @@
+{
+  "nodos": {
+    "Casino": [
+      -33.0343,
+      -71.5963
+    ],
+    "Kiosko": [
+      -33.0345,
+      -71.5957
+    ],
+    "Edificio B": [
+      -33.035,
+      -71.5952
+    ],
+    "Hall": [
+      -33.0356,
+      -71.5948
+    ],
+    "Edificio P": [
+      -33.0366,
+      -71.5942
+    ],
+    "Cafeteria Q": [
+      -33.0352,
+      -71.5968
+    ]
+  },
+  "aristas": [
+    [
+      "Casino",
+      "Kiosko"
+    ],
+    [
+      "Kiosko",
+      "Edificio B"
+    ],
+    [
+      "Edificio B",
+      "Hall"
+    ],
+    [
+      "Hall",
+      "Edificio P"
+    ],
+    [
+      "Casino",
+      "Cafeteria Q"
+    ],
+    [
+      "Cafeteria Q",
+      "Hall"
+    ]
+  ]
+}
