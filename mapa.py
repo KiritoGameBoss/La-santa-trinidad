@@ -20,8 +20,5 @@ mapa = folium.Map(
     # sin dragging=False: el mapa se puede mover
 )
 
-# Marcador
-folium.Marker([-33.03486, -71.59522], popup="¡Hola Sansano!").add_to(mapa)
-
 # Guardar web
 mapa.save("mi_mapa.html")
