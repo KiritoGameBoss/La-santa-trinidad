@@ -46,6 +46,7 @@ nodos = [
 nodos_por_id = {n["id"]: n for n in nodos}
 
 
+
 # ==========================================
 # 2. ARISTAS (tramos azules y rojos)
 # ==========================================
@@ -174,6 +175,8 @@ for u, v, canal in aristas:
 
 # Dibujar nodos con su ID visible al pasar el cursor o hacer clic
 for n in nodos:
+    if n["tipo"] == "paso":
+        continue
     lat, lon = n["coord"]
     etiqueta = f"ID {n['id']} — {n['nombre']}"
     if n["tipo"] == "entrada":
