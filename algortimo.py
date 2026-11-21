@@ -10,43 +10,47 @@ def haversine_metros(lat1, lon1, lat2, lon2):
     phi1, phi2 = np.radians(lat1), np.radians(lat2)
     dphi = np.radians(lat2 - lat1)
     dlambda = np.radians(lon2 - lon1)
-    a = np.sin(dphi / 2.0) ** 2 + np.cos(phi1) * np.cos(phi2) * np.sin(dlambda / 2.0) ** 2
+    a = (
+        np.sin(dphi / 2.0) ** 2
+        + np.cos(phi1) * np.cos(phi2) * np.sin(dlambda / 2.0) ** 2
+    )
     return 2.0 * r * np.arctan2(np.sqrt(a), np.sqrt(1.0 - a))
 
 
 # ==========================================
-# 1. INSTANCIAS DE NODOS (entradas verdes y quiebres/intersecciones)
+# 1. NODOS (IDs únicos del 0 al 17)
 # ==========================================
-# Cada entrada tiene: id, etiqueta, tipo ("entrada" o "interseccion"), edificio, (lat, lon)
 nodos = [
-    {"id": 0,  "nombre": "Acceso Edificio Negro",        "tipo": "entrada",      "edificio": "Negro",    "coord": (-33.0342, -71.5988)},
-    {"id": 1,  "nombre": "Quiebre Oeste Azul/Rojo",      "tipo": "interseccion", "edificio": None,       "coord": (-33.0346, -71.5979)},
-    {"id": 2,  "nombre": "Quiebre Sur Azul",             "tipo": "interseccion", "edificio": None,       "coord": (-33.0351, -71.5968)},
-    {"id": 3,  "nombre": "Quiebre Norte Rojo",           "tipo": "interseccion", "edificio": None,       "coord": (-33.0338, -71.5967)},
-    {"id": 4,  "nombre": "Entrada Edificio Amarillo",    "tipo": "entrada",      "edificio": "Amarillo", "coord": (-33.0341, -71.5962)},
-    {"id": 5,  "nombre": "Convergencia Central-Oeste",   "tipo": "interseccion", "edificio": None,       "coord": (-33.0343, -71.5955)},
-    {"id": 6,  "nombre": "Entrada Verde Central-Norte",  "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0344, -71.5950)},
-    {"id": 7,  "nombre": "Entrada Verde Central-Sur",    "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0353, -71.5948)},
-    {"id": 8,  "nombre": "Entrada Verde Central-Este",   "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0349, -71.5939)},
-    {"id": 9,  "nombre": "Entrada Verde Noreste",        "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0343, -71.5938)},
-    {"id": 10, "nombre": "Quiebre Sur-Oeste Naranja",    "tipo": "interseccion", "edificio": None,       "coord": (-33.0365, -71.5952)},
-    {"id": 11, "nombre": "Entrada Naranja Norte",        "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0353, -71.5936)},
-    {"id": 12, "nombre": "Entrada Naranja Este",         "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0348, -71.5924)},
-    {"id": 13, "nombre": "Entrada Naranja Sur",          "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0360, -71.5928)},
-    {"id": 14, "nombre": "Entrada Edificio Café",        "tipo": "entrada",      "edificio": "Café",     "coord": (-33.0366, -71.5926)},
-    {"id": 15, "nombre": "Convergencia Este Azul/Rojo",  "tipo": "interseccion", "edificio": None,       "coord": (-33.0345, -71.5927)},
-    {"id": 16, "nombre": "Quiebre Este Alto",            "tipo": "interseccion", "edificio": None,       "coord": (-33.0339, -71.5912)},
-    {"id": 17, "nombre": "Entrada Celeste (Valdés)",     "tipo": "entrada",      "edificio": "Celeste",  "coord": (-33.0335, -71.5902)},
+    {"id": 0,  "nombre": "Acceso Edificio Negro",       "tipo": "entrada",      "edificio": "Negro",    "coord": (-33.0342, -71.5988)},
+    {"id": 1,  "nombre": "Quiebre Oeste Azul/Rojo",     "tipo": "interseccion", "edificio": None,       "coord": (-33.0346, -71.5979)},
+    {"id": 2,  "nombre": "Quiebre Sur Azul",            "tipo": "interseccion", "edificio": None,       "coord": (-33.0351, -71.5968)},
+    {"id": 3,  "nombre": "Quiebre Norte Rojo",          "tipo": "interseccion", "edificio": None,       "coord": (-33.0338, -71.5967)},
+    {"id": 4,  "nombre": "Entrada Edificio Amarillo",   "tipo": "entrada",      "edificio": "Amarillo", "coord": (-33.0341, -71.5962)},
+    {"id": 5,  "nombre": "Convergencia Central-Oeste",  "tipo": "interseccion", "edificio": None,       "coord": (-33.0343, -71.5955)},
+    {"id": 6,  "nombre": "Entrada Verde Central-Norte", "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0344, -71.5950)},
+    {"id": 7,  "nombre": "Entrada Verde Central-Sur",   "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0353, -71.5948)},
+    {"id": 8,  "nombre": "Entrada Verde Central-Este",  "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0349, -71.5939)},
+    {"id": 9,  "nombre": "Entrada Verde Noreste",       "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0343, -71.5938)},
+    {"id": 10, "nombre": "Quiebre Sur-Oeste Naranja",   "tipo": "interseccion", "edificio": None,       "coord": (-33.0365, -71.5952)},
+    {"id": 11, "nombre": "Entrada Naranja Norte",       "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0353, -71.5936)},
+    {"id": 12, "nombre": "Entrada Naranja Este",        "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0348, -71.5924)},
+    {"id": 13, "nombre": "Entrada Naranja Sur",         "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0360, -71.5928)},
+    {"id": 14, "nombre": "Entrada Edificio Café",       "tipo": "entrada",      "edificio": "Café",     "coord": (-33.0366, -71.5926)},
+    {"id": 15, "nombre": "Convergencia Este Azul/Rojo", "tipo": "interseccion", "edificio": None,       "coord": (-33.0345, -71.5927)},
+    {"id": 16, "nombre": "Quiebre Este Alto",           "tipo": "interseccion", "edificio": None,       "coord": (-33.0339, -71.5912)},
+    {"id": 17, "nombre": "Entrada Celeste (Valdés)",    "tipo": "entrada",      "edificio": "Celeste",  "coord": (-33.0335, -71.5902)},
 ]
 
-coords = np.array([n["coord"] for n in nodos])
+# Diccionario rápido para cambiar coordenadas por ID sin equivocarte:
+# Ejemplo: nodos_por_id[1]["coord"] = (-33.03455, -71.59785)
+nodos_por_id = {n["id"]: n for n in nodos}
 
 
 # ==========================================
-# 2. INSTANCIAS DE ARISTAS (tramos azules y rojos)
+# 2. ARISTAS (tramos azules y rojos)
 # ==========================================
-# canal: "azul" (movilidad reducida + caminante) | "rojo" (solo movilidad reducida)
-# Si dos nodos se conectan por ambos canales en un tramo convergente, se incluyen ambas aristas.
+# "azul": caminantes y movilidad reducida
+# "rojo": solo movilidad reducida
 aristas = [
     # Rama oeste hacia zona amarilla y central
     (0, 1, "azul"), (0, 1, "rojo"),
@@ -82,27 +86,21 @@ aristas = [
 
 
 # ==========================================
-# 3. CONSTRUCCIÓN DE MATRIZ DISPERSA Y DIJKSTRA (csgraph)
+# 3. GRAFO EN SCIPY (csgraph)
 # ==========================================
-def construir_grafo(nodos_lista, aristas_lista, perfil="movilidad_reducida", factor_rojo=1.0):
-    """
-    perfil:
-      - "caminante": solo permite aristas 'azul'
-      - "movilidad_reducida": permite 'azul' y 'rojo'
-    """
-    n = len(nodos_lista)
+def construir_grafo(nodos_dict, aristas_lista, perfil="movilidad_reducida", factor_rojo=1.0):
+    n = len(nodos_dict)
     rows, cols, weights = [], [], []
 
     for u, v, canal in aristas_lista:
         if perfil == "caminante" and canal == "rojo":
             continue
 
-        lat1, lon1 = nodos_lista[u]["coord"]
-        lat2, lon2 = nodos_lista[v]["coord"]
+        lat1, lon1 = nodos_dict[u]["coord"]
+        lat2, lon2 = nodos_dict[v]["coord"]
         dist = haversine_metros(lat1, lon1, lat2, lon2)
         peso = dist * (factor_rojo if canal == "rojo" else 1.0)
 
-        # Grafo no dirigido (ida y vuelta)
         rows.extend([u, v])
         cols.extend([v, u])
         weights.extend([peso, peso])
@@ -122,10 +120,10 @@ def reconstruir_camino(pred, inicio, fin):
     return []
 
 
-origen, destino = 0, 17  # Ej: desde Acceso Edificio Negro (0) hasta Entrada Celeste (17)
-perfil_usuario = "movilidad_reducida"  # Cambia a "caminante" para probar restricción azul
+origen, destino = 0, 17
+perfil_usuario = "movilidad_reducida"  # Opciones: "movilidad_reducida" o "caminante"
 
-grafo = construir_grafo(nodos, aristas, perfil=perfil_usuario)
+grafo = construir_grafo(nodos_por_id, aristas, perfil=perfil_usuario)
 distancias, predecesores = dijkstra(
     csgraph=grafo,
     directed=False,
@@ -133,11 +131,11 @@ distancias, predecesores = dijkstra(
     return_predecessors=True,
 )
 ruta_nodos = reconstruir_camino(predecesores, origen, destino)
-ruta_coords = [nodos[i]["coord"] for i in ruta_nodos]
+ruta_coords = [nodos_por_id[i]["coord"] for i in ruta_nodos]
 
 
 # ==========================================
-# 4. VISUALIZACIÓN EN FOLIUM SOBRE TU MAPA
+# 4. MAPA EN FOLIUM
 # ==========================================
 mapa = folium.Map(
     location=[-33.03486, -71.5952],
@@ -159,32 +157,26 @@ mapa = folium.Map(
     max_lon=-71.588,
 )
 
-# Dibujar aristas según color (azul / rojo)
+# Muestra coordenadas [lat, lon] al hacer clic en cualquier parte del mapa
+folium.LatLngPopup().add_to(mapa)
+
+# Dibujar aristas azules y rojas
 for u, v, canal in aristas:
     color_linea = "#1d6fe8" if canal == "azul" else "#d62828"
     folium.PolyLine(
-        locations=[nodos[u]["coord"], nodos[v]["coord"]],
+        locations=[nodos_por_id[u]["coord"], nodos_por_id[v]["coord"]],
         color=color_linea,
         weight=3,
         opacity=0.75,
-        tooltip=f"Tramo {canal.upper()}: {u} <-> {v}",
+        tooltip=f"Tramo {canal.upper()}: ID {u} <-> ID {v}",
     ).add_to(mapa)
 
-# Resaltar ruta óptima calculada por SciPy
-if ruta_coords:
-    folium.PolyLine(
-        locations=ruta_coords,
-        color="#111111",
-        weight=6,
-        opacity=0.9,
-        tooltip=f"Ruta ({perfil_usuario}): {distancias[destino]:.1f} m",
-    ).add_to(mapa)
 
-# Dibujar nodos: cuadrados verdes para entradas/salidas, círculos para quiebres
+# Dibujar nodos con su ID visible al pasar el cursor o hacer clic
 for n in nodos:
     lat, lon = n["coord"]
+    etiqueta = f"ID {n['id']} — {n['nombre']}"
     if n["tipo"] == "entrada":
-        # Representación tipo cuadrado verde usando un polígono pequeño
         d = 0.000045
         cuadrado = [
             [lat - d, lon - d],
@@ -199,16 +191,19 @@ for n in nodos:
             fill_color="#2ecc71",
             fill_opacity=0.95,
             weight=2,
-            popup=f"[{n['id']}] {n['nombre']}",
+            tooltip=etiqueta,
+            popup=etiqueta,
         ).add_to(mapa)
     else:
         folium.CircleMarker(
             location=n["coord"],
-            radius=4,
+            radius=5,
             color="#333333",
             fill=True,
-            fill_opacity=0.85,
-            popup=f"[{n['id']}] Intersección {n['nombre']}",
+            fill_opacity=0.9,
+            tooltip=etiqueta,
+            popup=etiqueta,
         ).add_to(mapa)
 
-mapa.save("mapa_algortimo.html")
+mapa.save("mi_mapa.html")
+print("Mapa guardado en mi_mapa.html. Ruta:", ruta_nodos)
