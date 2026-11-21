@@ -117,8 +117,8 @@ aristas = [
  
     # Rama este hacia edificio M (Valdés)
     (9, 16, "azul"),     # antes pasaba por el nodo 15 (eliminado)
-    (11, 22, "rojo"),
-    (16, 22, "rojo"),
+    (11, 22, "azul"),
+    (16, 22, "azul"),
     (12, 16, "rojo"),    # antes pasaba por el nodo 15 (eliminado)
     (12, 22, "rojo"),
     (16, 17, "azul"),
@@ -260,15 +260,7 @@ def crear_mapa(ruta=None, archivo="mi_mapa.html"):
         zoom_start=17,
         min_zoom=17,
         max_zoom=17,
-        tiles="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png",
-        attr="© OpenStreetMap contributors, tiles by OSM France",
-        zoom_control=False,
-        scrollWheelZoom=False,
-        doubleClickZoom=False,
-        touchZoom=False,
-        boxZoom=False,
-        keyboard=False,
-        max_bounds=True,
+        tiles="OpenStreetMap",
         min_lat=-33.040,
         max_lat=-33.030,
         min_lon=-71.602,
