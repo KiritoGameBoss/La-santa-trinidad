@@ -37,7 +37,7 @@
 ## Tecnologias utilizadas:
     Mapa de la api de Openstreetmap.fr
     Se uso Python como lenguaje principal
-    la libreria utilizadas scipy, python-fasthtml , folium y numpy, 
+    la libreria utilizadas scipy, python-fasthtml , folium y numpy, flask
 
 ## Herramientas de inteligencia artificicial:
     Se uso Claude, para corregir problemas errores que aparecian en nuestro mapa 
