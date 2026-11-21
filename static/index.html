@@ -44,9 +44,6 @@
               </div>
 
               <button type="submit" class="btn btn-primary w-100 mb-2">Generar Mapa</button>
-              <button type="button" id="btnInvertirRuta" class="btn btn-outline-warning w-100" disabled>
-                Invertir Ruta
-              </button>
             </form>
 
             <div id="estadoRuta" class="alert alert-info mt-3 d-none py-2 small"></div>
@@ -69,7 +66,6 @@
     const selectDestino = document.getElementById("selectDestino");
     const switchDiscapacitados = document.getElementById("switchDiscapacitados");
     const textoModoRuta = document.getElementById("textoModoRuta");
-    const btnInvertirRuta = document.getElementById("btnInvertirRuta");
     const rutaForm = document.getElementById("rutaForm");
     const estadoRuta = document.getElementById("estadoRuta");
     const mapaFrame = document.getElementById("mapaFrame");
@@ -132,7 +128,6 @@
         }
 
         rutaGenerada = true;
-        btnInvertirRuta.disabled = false;
         mapaFrame.src = `/mapa?${params}`;   // el servidor dibuja la ruta
 
         let html = `<strong>${origen} → ${destino}</strong>: ${data.metros} m, ~${data.minutos} min a pie`;
@@ -152,13 +147,11 @@
 
     selectOrigen.addEventListener("change", () => {
       rutaGenerada = false;
-      btnInvertirRuta.disabled = true;
       poblarSelects(selectOrigen.value, selectDestino.value);
     });
 
     selectDestino.addEventListener("change", () => {
       rutaGenerada = false;
-      btnInvertirRuta.disabled = true;
     });
 
     switchDiscapacitados.addEventListener("change", () => {
@@ -168,13 +161,6 @@
 
     rutaForm.addEventListener("submit", e => {
       e.preventDefault();
-      generarMapaActual();
-    });
-
-    btnInvertirRuta.addEventListener("click", () => {
-      if (!rutaGenerada) return;
-      const o = selectOrigen.value, d = selectDestino.value;
-      poblarSelects(d, o);
       generarMapaActual();
     });
 
