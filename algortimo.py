@@ -21,24 +21,24 @@ def haversine_metros(lat1, lon1, lat2, lon2):
 # 1. NODOS (IDs únicos del 0 al 17)
 # ==========================================
 nodos = [
-    {"id": 0,  "nombre": "Acceso Edificio Negro",       "tipo": "entrada",      "edificio": "Negro",    "coord": (-33.0342, -71.5988)},
-    {"id": 1,  "nombre": "Quiebre Oeste Azul/Rojo",     "tipo": "interseccion", "edificio": None,       "coord": (-33.0346, -71.5979)},
-    {"id": 2,  "nombre": "Quiebre Sur Azul",            "tipo": "interseccion", "edificio": None,       "coord": (-33.0351, -71.5968)},
-    {"id": 3,  "nombre": "Quiebre Norte Rojo",          "tipo": "interseccion", "edificio": None,       "coord": (-33.0338, -71.5967)},
-    {"id": 4,  "nombre": "Entrada Edificio Amarillo",   "tipo": "entrada",      "edificio": "Amarillo", "coord": (-33.0341, -71.5962)},
-    {"id": 5,  "nombre": "Convergencia Central-Oeste",  "tipo": "interseccion", "edificio": None,       "coord": (-33.0343, -71.5955)},
-    {"id": 6,  "nombre": "Entrada Verde Central-Norte", "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0344, -71.5950)},
-    {"id": 7,  "nombre": "Entrada Verde Central-Sur",   "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0353, -71.5948)},
-    {"id": 8,  "nombre": "Entrada Verde Central-Este",  "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0349, -71.5939)},
-    {"id": 9,  "nombre": "Entrada Verde Noreste",       "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0343, -71.5938)},
+    {"id": 0,  "nombre": "Acceso Edificio Negro",       "tipo": "entrada",      "edificio": "Negro",    "coord": (-33.035189, -71.597636)},
+    {"id": 1,  "nombre": "Quiebre Oeste Azul/Rojo",     "tipo": "interseccion", "edificio": None,       "coord": (-33.035496, -71.597156 )},
+    {"id": 2,  "nombre": "Quiebre Sur Azul",            "tipo": "interseccion", "edificio": None,       "coord": (-33.035664, -71.596372)},
+    {"id": 3,  "nombre": "Quiebre Norte Rojo",          "tipo": "interseccion", "edificio": None,       "coord": (-33.034875, -71.596187)},
+    {"id": 4,  "nombre": "Entrada Edificio Amarillo",   "tipo": "entrada",      "edificio": "Amarillo", "coord": (-33.035286, -71.595930)},
+    {"id": 5,  "nombre": "Convergencia Central-Oeste",  "tipo": "interseccion", "edificio": None,       "coord": (-33.035510, -71.595729)},
+    {"id": 6,  "nombre": "Entrada Verde Central-Norte", "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0355, -71.5954)}, #no
+    {"id": 7,  "nombre": "Entrada Verde Central-Sur",   "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0359, -71.5952)},
+    {"id": 8,  "nombre": "Entrada Verde Central-Este",  "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0357, -71.5947)},
+    {"id": 9,  "nombre": "Entrada Verde Noreste",       "tipo": "entrada",      "edificio": "Verde",    "coord": (-33.0353, -71.5949)},
     {"id": 10, "nombre": "Quiebre Sur-Oeste Naranja",   "tipo": "interseccion", "edificio": None,       "coord": (-33.0365, -71.5952)},
-    {"id": 11, "nombre": "Entrada Naranja Norte",       "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0353, -71.5936)},
-    {"id": 12, "nombre": "Entrada Naranja Este",        "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0348, -71.5924)},
-    {"id": 13, "nombre": "Entrada Naranja Sur",         "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0360, -71.5928)},
-    {"id": 14, "nombre": "Entrada Edificio Café",       "tipo": "entrada",      "edificio": "Café",     "coord": (-33.0366, -71.5926)},
-    {"id": 15, "nombre": "Convergencia Este Azul/Rojo", "tipo": "interseccion", "edificio": None,       "coord": (-33.0345, -71.5927)},
-    {"id": 16, "nombre": "Quiebre Este Alto",           "tipo": "interseccion", "edificio": None,       "coord": (-33.0339, -71.5912)},
-    {"id": 17, "nombre": "Entrada Celeste (Valdés)",    "tipo": "entrada",      "edificio": "Celeste",  "coord": (-33.0335, -71.5902)},
+    {"id": 11, "nombre": "Entrada Naranja Norte",       "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0358, -71.5946)},
+    {"id": 12, "nombre": "Entrada Naranja Este",        "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0357, -71.5938)},
+    {"id": 13, "nombre": "Entrada Naranja Sur",         "tipo": "entrada",      "edificio": "Naranja",  "coord": (-33.0363, -71.5944)},
+    {"id": 14, "nombre": "Entrada Edificio Café",       "tipo": "entrada",      "edificio": "Café",     "coord": (-33.0370, -71.5942)},
+    {"id": 15, "nombre": "Convergencia Este Azul/Rojo", "tipo": "interseccion", "edificio": None,       "coord": (-33.0353, -71.5933)},
+    {"id": 16, "nombre": "Quiebre Este Alto",           "tipo": "interseccion", "edificio": None,       "coord": (-33.0353, -71.5933)},
+    {"id": 17, "nombre": "Entrada Celeste (Valdés)",    "tipo": "entrada",      "edificio": "Celeste",  "coord": (-33.0351, -71.5929)},
 ]
 
 # Diccionario rápido para cambiar coordenadas por ID sin equivocarte:
@@ -206,4 +206,3 @@ for n in nodos:
         ).add_to(mapa)
 
 mapa.save("mi_mapa.html")
-print("Mapa guardado en mi_mapa.html. Ruta:", ruta_nodos)
