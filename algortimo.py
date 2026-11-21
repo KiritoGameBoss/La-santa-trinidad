@@ -39,6 +39,13 @@ nodos = [
     {"id": 15, "nombre": "Convergencia Este Azul/Rojo", "tipo": "interseccion", "edificio": None,       "coord": (-33.0353, -71.5933)},
     {"id": 16, "nombre": "Quiebre Este Alto",           "tipo": "interseccion", "edificio": None,       "coord": (-33.0353, -71.5933)},
     {"id": 17, "nombre": "Entrada Celeste (Valdés)",    "tipo": "entrada",      "edificio": "Celeste",  "coord": (-33.0351, -71.5929)},
+    {"id": 18, "nombre": "intersec",    "tipo": "interseccion",      "edificio": "Naranja",  "coord": (-33.0360,-71.5945)},
+    {"id": 19, "nombre": "interseci",    "tipo": "interseccion",      "edificio": None,  "coord": (-33.0360,-71.5937)},
+    {"id": 20, "nombre": "interseci",    "tipo": "interseccion",      "edificio": None,  "coord": (-33.0361 ,-71.5957)},
+    {"id": 21, "nombre": "interseci",    "tipo": "interseccion",      "edificio": None,  "coord": (-33.0358 , -71.5959)},
+    {"id": 22, "nombre": "interseci",    "tipo": "interseccion",      "edificio": None,  "coord": (-33.0355, -71.5939)},
+
+
 ]
 
 # Diccionario rápido para cambiar coordenadas por ID sin equivocarte:
@@ -60,27 +67,35 @@ aristas = [
     (3, 4, "rojo"),
     (2, 5, "azul"),
     (4, 5, "azul"),
+    (21, 20, "azul"),
+    (21, 5, "azul"),
+    (20, 7, "azul"),
+    (21, 2, "rojo"),
 
     # Bloque central (verde oscuro)
     (5, 6, "azul"),
     (6, 7, "rojo"),
     (6, 9, "rojo"),
-    (7, 8, "rojo"),
-    (8, 9, "rojo"),
-
+   
+    (8, 9, "Rojo"),
+    (8, 11, "azul"),
     # Rama sur hacia edificios naranja y café
-    (2, 10, "azul"),
-    (7, 10, "azul"),
+    (20, 10, "azul"),
     (10, 13, "azul"),
-    (7, 11, "rojo"),
-    (11, 12, "rojo"),
-    (12, 13, "rojo"),
+    (7, 11, "azul"),
+    (11, 18, "rojo"),
+    (18, 13, "rojo"),
+    (19, 13, "rojo"),
+    (19, 12, "rojo"),
+    (18, 12, "rojo"),
     (13, 14, "azul"), (13, 14, "rojo"),
 
     # Rama este hacia edificio celeste (Valdés)
     (9, 15, "azul"),
-    (11, 15, "rojo"),
+    (11, 22, "rojo"),
+    (16, 22, "rojo"),
     (12, 15, "rojo"),
+    (12, 22, "rojo"),
     (15, 16, "azul"), (15, 16, "rojo"),
     (16, 17, "azul"), (16, 17, "rojo"),
 ]
